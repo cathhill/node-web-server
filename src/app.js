@@ -6,6 +6,9 @@ const { Server } = require("http");
 //for partials:
 const hbs = require("hbs");
 
+const geocode = require("./utils/geocode");
+const forecast = require("./utils/forecast");
+
 const app = express();
 
 //Define paths for Express config
@@ -82,10 +85,23 @@ app.get("/weather", (req, res) => {
       error: "You must provide an address",
     });
   }
-  res.send({
-    forecast: "15°",
-    location: "London",
-    address: req.query.address,
+  // callback often takes two arguments: error and data. Only one of these will have a value, the other will be undefined. Data here is destructured.
+  geocode(req.query.address, (error, { latitude, longitude, location }) => {
+    if (error) {
+      return res.send({ error });
+    }
+    //return only returns one thing and then stops running, so the forecast data won't show if there is a geocode error.
+    // forecastData comes from geocode function. Can't be called data as prevents getting 'data' from geocode above.
+    forecast(latitude, longitude, (error, forecastData) => {
+      if (error) {
+        return res.send({ error });
+      }
+      res.send({
+        forecast: forecastData,
+        location: location,
+        address: req.query.address,
+      });
+    });
   });
 });
 
