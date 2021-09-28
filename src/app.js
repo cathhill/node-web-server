@@ -77,7 +77,28 @@ app.get("/help", (req, res) => {
 
 //app.com/weather. View on localhost:2000/weather.
 app.get("/weather", (req, res) => {
-  res.send({ forecast: "15°", location: "London" });
+  if (!req.query.address) {
+    return res.send({
+      error: "You must provide an address",
+    });
+  }
+  res.send({
+    forecast: "15°",
+    location: "London",
+    address: req.query.address,
+  });
+});
+
+app.get("/products", (req, res) => {
+  if (!req.query.search) {
+    return res.send({
+      error: "You must provide a search term",
+    });
+  } //return stops the below section of code running so no problem with there being 2x responses.
+  console.log(req.query.search);
+  res.send({
+    products: [],
+  });
 });
 
 // /help/* deals with every other route starting with /help/.
