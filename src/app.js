@@ -86,23 +86,27 @@ app.get("/weather", (req, res) => {
     });
   }
   // callback often takes two arguments: error and data. Only one of these will have a value, the other will be undefined. Data here is destructured.
-  geocode(req.query.address, (error, { latitude, longitude, location }) => {
-    if (error) {
-      return res.send({ error });
-    }
-    //return only returns one thing and then stops running, so the forecast data won't show if there is a geocode error.
-    // forecastData comes from geocode function. Can't be called data as prevents getting 'data' from geocode above.
-    forecast(latitude, longitude, (error, forecastData) => {
+  // "={}" provides a default empty object for the data parameters (latitude, longitude, location) so that code still runs if the search provided isn't valid.
+  geocode(
+    req.query.address,
+    (error, { latitude, longitude, location } = {}) => {
       if (error) {
         return res.send({ error });
       }
-      res.send({
-        forecast: forecastData,
-        location: location,
-        address: req.query.address,
+      //return only returns one thing and then stops running, so the forecast data won't show if there is a geocode error.
+      // forecastData comes from geocode function. Can't be called data as prevents getting 'data' from geocode above.
+      forecast(latitude, longitude, (error, forecastData) => {
+        if (error) {
+          return res.send({ error });
+        }
+        res.send({
+          forecast: forecastData,
+          location: location,
+          address: req.query.address,
+        });
       });
-    });
-  });
+    }
+  );
 });
 
 app.get("/products", (req, res) => {
