@@ -10,6 +10,8 @@ const geocode = require("./utils/geocode");
 const forecast = require("./utils/forecast");
 
 const app = express();
+// need to add this line so heroku can work - accesses environment variable for heroku. If this doesn't exist it uses the local port 3000:
+const port = process.env.PORT || 3000;
 
 //Define paths for Express config
 //path is a core node module. .. goes up a folder level, ../.. goes up two.
@@ -140,6 +142,6 @@ app.get("*", (req, res) => {
 });
 
 //starts the server (using port 3000). It will stay running on localhost:3000 unless it is stopped (ctrl+c).
-app.listen(3000, () => {
-  console.log("Server is up on port 3000.");
+app.listen(port, () => {
+  console.log("Server is up on port " + port);
 });
